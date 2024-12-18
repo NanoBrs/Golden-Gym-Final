@@ -1,5 +1,6 @@
 
 from django.db import models
+from django.contrib.auth.models import AbstractUser
 
 class Cliente(models.Model):
     PLANES_MEMBRESIA = [
@@ -18,28 +19,18 @@ class Cliente(models.Model):
 
     def __str__(self):
         return f"{self.nombre} {self.apellido} - {self.membresia}"
+    
 
-class Encargado(models.Model):
-    # Nombre del encargado
-    nombre = models.CharField(max_length=100)
 
-    # Apellido del encargado
-    apellido = models.CharField(max_length=100)
 
-    # RUT (Rol Único Tributario) del encargado
+class Encargado(AbstractUser):
+    # Solo agregamos el campo 'rut' ya que 'username', 'email' y 'password' ya están definidos en AbstractUser
     rut = models.CharField(max_length=12, unique=True)
 
-    # Correo electrónico del encargado
-    correo = models.EmailField(max_length=100, unique=True)
-
-    # Nombre de usuario para login
-    usuario = models.CharField(max_length=50, unique=True)
-
-    # Contraseña para login (se recomienda usar el sistema de autenticación de Django)
-    contraseña = models.CharField(max_length=100)
-
     def __str__(self):
-        return f"{self.nombre} {self.apellido} ({self.usuario})"
+        return f"{self.username} ({self.rut})"  # O cualquier otro campo que quieras mostrar
+    
+
     
 class Novedad(models.Model):
     titulo = models.CharField(max_length=100)

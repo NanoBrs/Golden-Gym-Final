@@ -17,27 +17,21 @@ class ClienteForm(forms.ModelForm):
             'rut': forms.TextInput(attrs={'class': 'form-control', 'style': 'background-color: #666; color: white;'}),
             'correo': forms.EmailInput(attrs={'class': 'form-control', 'style': 'background-color: #666; color: white;'}),
         }
-
 class EncargadoForm(forms.ModelForm):
-    # Definir el formulario utilizando el modelo Encargado
     class Meta:
         model = Encargado
-        fields = ['nombre', 'apellido', 'rut', 'correo', 'usuario', 'contraseña']
-        
+        fields = ['username', 'first_name', 'last_name', 'rut', 'email', 'password']
         widgets = {
-            'contraseña': forms.PasswordInput(attrs={'placeholder': 'Contraseña'}),  # Campo de contraseña, muestra un placeholder
+            'password': forms.PasswordInput(),
         }
 
-    # Método adicional para realizar validaciones personalizadas si es necesario
-    def clean_rut(self):
-        rut = self.cleaned_data.get('rut')
-        # Aquí puedes agregar validaciones para el RUT
-        return rut
-
-    def clean_correo(self):
-        correo = self.cleaned_data.get('correo')
-        # Aquí puedes agregar validaciones adicionales para el correo
-        return correo
+    def save(self, commit=True):
+        encargado = super().save(commit=False)
+        if self.cleaned_data['password']:
+            encargado.set_password(self.cleaned_data['password'])  # Se asegura de que la contraseña sea almacenada de forma segura
+        if commit:
+            encargado.save()
+        return encargado
 
 class NovedadForm(forms.ModelForm):
     class Meta:

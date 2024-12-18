@@ -20,65 +20,44 @@
             
             <div class="card-header">
                 <h2 class="text-center mb-4">Gestión de Encargado</h2>
-
             </div>
             <div id="Container" class="card-body">
                 <form method="POST">
                     {% csrf_token %}
-
                     <div class="form-row">
-                        <div class="col-8">
-                            <div class="form-row">
-                                <div class="col">
-                                    <label for="id_nombre">Nombre:</label>
-                                    <input type="text" name="nombre" id="id_nombre" class="form-control" placeholder="Ingrese su nombre" value="{{ form.nombre.value|default:'' }}">
-                                </div>
-                                
-
-                                <div class="col">
-                                    <label for="id_rut">RUT:</label>
-                                    <input type="text" name="rut" id="id_rut" class="form-control" placeholder="Ingrese su RUT" value="{{ form.rut.value|default:'' }}">
-                                </div>
-                            </div>
-
-                            <div class="form-row">
-                                <div class="col">
-                                    <label for="id_apellido">Apellido:</label>
-                                    <input type="text" name="apellido" id="id_apellido" class="form-control"  placeholder="Ingrese su apellido" value="{{ form.apellido.value|default:'' }}">
-                                </div>
-                                
-
-                                <div class="col">
-                                    <label for="id_correo">Correo:</label>
-                                    <input type="email" name="correo" id="id_correo" class="form-control"  placeholder="Ingrese su correo" value="{{ form.correo.value|default:'' }}">
-                                </div>
-                            </div>
-
-                            <div class="form-row mt-3">
-                                <button type="submit" class="btn btn-danger m-2">Eliminar</button>
-                                <button type="submit" class="btn btn-primary m-2">Modificar</button>
-                                <button type="submit" class="btn btn-success m-2">Guardar</button>
-                            </div>
-
+                        <div class="col">
+                            <label for="id_username">Usuario:</label>
+                            <input type="text" name="username" id="id_username" class="form-control" placeholder="Ingrese un usuario" value="{{ form.username.value|default:'' }}">
                         </div>
-                        <div class="col-4">
-                            <div class="form-row ">
-                                <label for="id_correo">Usuario:</label>
-                                <input type="text" name="correo" id="id_correo" class="form-control"  placeholder="Ingrese su usuario" value="{{ form.correo.value|default:'' }}">
-
-                            </div>
-                            <div class="form-row ">
-                                <label for="id_correo">Contraseña:</label>
-                                <input type="password" name="pass" id="id_correo" class="form-control"  placeholder="Ingrese su contraseña" value="{{ form.correo.value|default:'' }}">
-
-                            </div>
-
+                        <div class="col">
+                            <label for="id_password">Contraseña:</label>
+                            <input type="password" name="password" id="id_password" class="form-control" placeholder="Ingrese una contraseña">
                         </div>
-                        
                     </div>
-
+                    <div class="form-row mt-3">
+                        <div class="col">
+                            <label for="id_first_name">Nombre:</label>
+                            <input type="text" name="first_name" id="id_first_name" class="form-control" placeholder="Ingrese su nombre" value="{{ form.first_name.value|default:'' }}">
+                        </div>
+                        <div class="col">
+                            <label for="id_last_name">Apellido:</label>
+                            <input type="text" name="last_name" id="id_last_name" class="form-control" placeholder="Ingrese su apellido" value="{{ form.last_name.value|default:'' }}">
+                        </div>
+                    </div>
+                    <div class="form-row mt-3">
+                        <div class="col">
+                            <label for="id_rut">RUT:</label>
+                            <input type="text" name="rut" id="id_rut" class="form-control" placeholder="Ingrese su RUT" value="{{ form.rut.value|default:'' }}">
+                        </div>
+                        <div class="col">
+                            <label for="id_email">Correo:</label>
+                            <input type="email" name="email" id="id_email" class="form-control" placeholder="Ingrese su correo" value="{{ form.email.value|default:'' }}">
+                        </div>
+                    </div>
+                    <div class="form-row mt-3">
+                        <button type="submit" class="btn btn-success">Guardar</button>
+                    </div>
                 </form>
-                
             </div>
         </div>
 
@@ -89,7 +68,7 @@
                 <div class="form-row mt-3">
                     <div class="col-4">
                         <label for="searchInput" class="sr-only">Buscar</label>
-                        <input type="text" class="form-control" id="searchInput" placeholder="Escribe aquí..." required >
+                        <input type="text" class="form-control" id="searchInput" placeholder="Escribe aquí..." required>
                     </div>
                     <div class="col">
                         <button type="submit" class="btn btn-primary mb-2">Buscar</button>
@@ -105,7 +84,6 @@
                             <th>Apellido</th>
                             <th>RUT</th>
                             <th>Correo</th>
-                            <th>Contraseña</th>
                             <th>Usuario</th>
                             <th>Acciones</th>
                         </tr>
@@ -114,12 +92,11 @@
                         {% for encargado in encargados %}
                         <tr>
                             <td>{{ encargado.id }}</td>
-                            <td>{{ encargado.nombre }}</td>
-                            <td>{{ encargado.apellido }}</td>
+                            <td>{{ encargado.first_name }}</td>
+                            <td>{{ encargado.last_name }}</td>
                             <td>{{ encargado.rut }}</td>
-                            <td>{{ encargado.correo }}</td>
-                            <td>{{ encargado.contraseña }}</td>
-                            <td>{{ encargado.usuario }}</td>
+                            <td>{{ encargado.email }}</td>
+                            <td>{{ encargado.username }}</td>
                             <td>
                                 <!-- Botón para editar encargado -->
                                 <form method="post" style="display:inline;">

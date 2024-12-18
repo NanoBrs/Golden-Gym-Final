@@ -1,0 +1,44 @@
+{% extends 'GoldenGymApp/base.html' %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+
+    {% block content %}
+
+
+    <div id="ContainerGeneral" class="container mt-5 p-5">
+        <h2>INICIAR SESIÓN </h2>
+        <h5>Es necesario autenticarse como encargado para acceder a funcionalidades mas complejas.</h5>
+        <form method="post">
+            {% csrf_token %}
+            <div>
+                <label for="id_username">Username:</label>
+                <input type="text" name="username" id="id_username" required>
+            </div>
+            <div>
+                <label for="id_password">Password:</label>
+                <input type="password" name="password" id="id_password" required>
+            </div>
+            <button type="submit">Login</button>
+        </form>
+        {% if form.errors %}
+            <p style="color: red;">{{ form.errors }}</p>
+        {% endif %}
+        
+            
+       
+
+    </div>
+   
+
+    {% endblock %}
+</body>
+</html>

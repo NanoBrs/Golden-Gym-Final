@@ -77,7 +77,7 @@ WSGI_APPLICATION = 'GoldenGym.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'goldengym',
+        'NAME': 'goldengymfinal',
         'USER': 'root',
         'PASSWORD': '',
         'HOST': 'localhost',
@@ -125,8 +125,12 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Carpeta de recopilación de archivos estáticos en producción
-AUTH_USER_MODEL = 'GoldenGymApp.Encargado'
 
+# Configuración de autenticación y permisos
+AUTH_USER_MODEL = 'GoldenGymApp.Encargado'
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/gestion_encargado/'
+LOGOUT_REDIRECT_URL = 'login'
 # Archivos de medios (imágenes y otros archivos subidos por usuarios)
 MEDIA_URL = '/media/'  # URL pública para acceder a los medios
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Carpeta donde se almacenan los archivos subidos

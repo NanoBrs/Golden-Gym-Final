@@ -44,32 +44,6 @@ def eliminar_cliente(request, cliente_id):
     cliente.delete()
     return HttpResponseRedirect(reverse('gestion_clientes'))
 
-def gestion_encargados(request):
-    if request.method == 'POST':
-        if 'encargado_id' in request.POST:
-            # Editar encargado existente
-            encargado = get_object_or_404(Encargado, id=request.POST['encargado_id'])
-            form = EncargadoForm(request.POST, instance=encargado)
-        else:
-            # Crear nuevo encargado
-            form = EncargadoForm(request.POST)
-
-        if form.is_valid():
-            form.save()
-            return redirect('gestion_encargados')  # Redirige para evitar reenvíos de formulario
-
-    else:
-        form = EncargadoForm()  # Formulario vacío para crear un nuevo encargado
-
-    # Obtener la lista de todos los encargados
-    encargados = Encargado.objects.all()
-    return render(request, 'GoldenGymApp/gestion_encargado.html', {'form': form, 'encargados': encargados})
-
-# Vista para eliminar encargado
-def eliminar_encargado(request, encargado_id):
-    encargado = get_object_or_404(Encargado, id=encargado_id)
-    encargado.delete()
-    return HttpResponseRedirect(reverse('gestion_encargados'))
 
 def validar_ingreso(request):
     mensaje = None
@@ -165,7 +139,8 @@ from django.template.loader import render_to_string
 from django.http import HttpResponse
 from io import BytesIO
 import base64
-
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
 from .models import Cliente, Reporte
 
 
@@ -222,7 +197,7 @@ def generar_pdf_historial_reportes(request, cliente_id):
     response['Content-Disposition'] = f'attachment; filename="historial_reportes_cliente_{cliente.nombre}_{cliente.apellido}.pdf"'
     
     return response
-
+@login_required
 def gestion_planes(request):
     if request.method == 'POST':
         if 'plan_id' in request.POST:
@@ -242,12 +217,12 @@ def gestion_planes(request):
     # Obtener la lista de todos los planes
     planes = Plan.objects.all()
     return render(request, 'GoldenGymApp/gestion_planes.html', {'form': form, 'planes': planes})
-
+@login_required
 def eliminar_plan(request, plan_id):
     plan = get_object_or_404(Plan, id=plan_id)
     plan.delete()
     return HttpResponseRedirect(reverse('gestion_planes'))
-
+@login_required
 def editar_plan(request, plan_id):
     # Obtener el plan que se está editando
     plan = get_object_or_404(Plan, id=plan_id)
@@ -266,7 +241,7 @@ def editar_plan(request, plan_id):
 
     # Pasamos el formulario a la plantilla
     return render(request, 'GoldenGymApp/gestion_planes.html', {'form': form, 'plan': plan})
-
+@login_required
 def registro_usuario(request):
     
     form = ClienteForm()
@@ -276,3 +251,82 @@ def registro_usuario(request):
             form.save()
             # Redirigir o hacer algo después de guardar
     return render(request, 'GoldenGymApp/registro.html', {'form': form})
+
+
+@login_required
+def gestion_encargados(request):
+    if request.method == "POST":
+        encargado_id = request.POST.get('encargado_id')
+        if encargado_id:  # Editar encargado
+            encargado = get_object_or_404(Encargado, id=encargado_id)
+            form = EncargadoForm(request.POST, instance=encargado)
+        else:  # Crear nuevo encargado
+            form = EncargadoForm(request.POST)
+
+        if form.is_valid():
+            form.save()
+            return redirect('gestion_encargado')
+
+    else:
+        form = EncargadoForm()
+
+    encargados = Encargado.objects.all()
+    return render(request, 'GoldenGymApp/gestion_encargado.html', {
+        'form': form,
+        'encargados': encargados
+    })
+
+@login_required
+def eliminar_encargado(request, id):
+    encargado = get_object_or_404(Encargado, id=id)
+    encargado.delete()
+    return redirect('gestion_encargado')
+
+def login_view(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+        
+        if user is not None:
+            login(request, user)
+            print("no funciona")
+            # Obtener la URL a la que el usuario intentaba acceder
+            next_url = request.GET.get('next', 'gestion_encargados')  # Redirige a 'gestion_encargado' por defecto
+            return redirect(next_url)
+        else:
+            print("no funciona 2")
+            return render(request, 'GoldenGymApp/login.html', {'error': 'Credenciales inválidas'})
+            
+    # Si el método es GET, no se muestra ningún error o mensaje
+    return render(request, 'GoldenGymApp/login.html')
+
+#--------------------------- Encargado función antigua -------------------------------------
+'''
+def gestion_encargados(request):
+    if request.method == 'POST':
+        if 'encargado_id' in request.POST:
+            # Editar encargado existente
+            encargado = get_object_or_404(Encargado, id=request.POST['encargado_id'])
+            form = EncargadoForm(request.POST, instance=encargado)
+        else:
+            # Crear nuevo encargado
+            form = EncargadoForm(request.POST)
+
+        if form.is_valid():
+            form.save()
+            return redirect('gestion_encargados')  # Redirige para evitar reenvíos de formulario
+
+    else:
+        form = EncargadoForm()  # Formulario vacío para crear un nuevo encargado
+
+    # Obtener la lista de todos los encargados
+    encargados = Encargado.objects.all()
+    return render(request, 'GoldenGymApp/gestion_encargado.html', {'form': form, 'encargados': encargados})
+
+# Vista para eliminar encargado
+def eliminar_encargado(request, encargado_id):
+    encargado = get_object_or_404(Encargado, id=encargado_id)
+    encargado.delete()
+    return HttpResponseRedirect(reverse('gestion_encargados'))
+    '''
