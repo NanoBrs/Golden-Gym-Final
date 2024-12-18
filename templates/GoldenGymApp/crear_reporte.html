@@ -1,0 +1,53 @@
+{% extends 'GoldenGymApp/base.html' %}
+
+{% block content %}
+<div id="ContainerGeneral" class="container mt-5 p-5">
+    <h2 class="mb-4">Crear Reporte para: {{ cliente.nombre }} {{ cliente.apellido }}</h2>
+
+    <form method="post">
+        {% csrf_token %}
+        
+        <!-- Fila para fecha y peso actual -->
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="fecha">Fecha</label>
+                <input type="date" class="form-control" name="fecha" id="fecha" value="{{ form.fecha.value }}">
+            </div>
+            <div class="form-group col-md-6">
+                <label for="peso_actual">Peso Actual [KG] :</label>
+                <input type="number" class="form-control" name="peso_actual" id="peso_actual" value="{{ form.peso_actual.value }}">
+            </div>
+        </div>
+        
+        <!-- Fila para altura y press banca -->
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="altura">Altura [M] :</label>
+                <input type="number" class="form-control" name="altura" id="altura" value="{{ form.altura.value }}">
+            </div>
+            <div class="form-group col-md-6">
+                <label for="press_banca">Press Banca [KG] :</label>
+                <input type="number" class="form-control" name="press_banca" id="press_banca" value="{{ form.press_banca.value }}">
+            </div>
+        </div>
+
+        <!-- Fila para sentadilla y peso muerto -->
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="sentadilla">Sentadilla [KG] :</label>
+                <input type="number" class="form-control" name="sentadilla" id="sentadilla" value="{{ form.sentadilla.value }}">
+            </div>
+            <div class="form-group col-md-6">
+                <label for="peso_muerto">Peso Muerto [KG] :</label>
+                <input type="number" class="form-control" name="peso_muerto" id="peso_muerto" value="{{ form.peso_muerto.value }}">
+            </div>
+        </div>
+
+        <!-- Botones -->
+        <div class="d-flex justify-content-between mt-4">
+            <button type="submit" class="btn btn-success btn-lg">Guardar Reporte</button>
+            <a href="{% url 'reportes_cliente' cliente.id %}" class="btn btn-secondary btn-lg">Volver a los Reportes</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

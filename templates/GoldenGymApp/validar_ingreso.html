@@ -1,0 +1,65 @@
+{% extends 'GoldenGymApp/base.html' %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ingreso - Validación de RUT</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+
+    {% block content %}
+    
+
+    <div id="ContainerGeneral" class="container mt-5">
+
+        <div id="ContainerGeneral1" class="card">
+            <div class="card-header">
+                <h3>Ingreso de Usuario</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST" class="form-row">
+                    {% csrf_token %}
+                    <div class="col-6">
+
+                        <div class="form-group">
+
+                            <label class="display-3" for="rut">RUT:</label>
+                            <input type="text" id="rut" name="rut" class="form-control display-1" placeholder="Ingrese su RUT" required style="font-size: 30px;">
+                        </div>
+
+                    </div>
+
+                    <div class="col-6">
+                        <img id="LogoIngreso" src="{% static 'img/logo.jpg' %}" alt="Logo" >
+
+
+
+                    </div>
+                        <button type="submit" class="btn btn-primary">Validar Ingreso</button>
+
+
+
+
+                        
+                    
+                    
+                   
+                </form>
+
+                {% if mensaje %}
+                    <div class="alert alert-info mt-3">
+                        {{ mensaje }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+
+    {% endblock %}
+</body>
+</html>

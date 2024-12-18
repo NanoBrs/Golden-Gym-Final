@@ -1,0 +1,144 @@
+{% extends 'GoldenGymApp/base.html' %}
+
+{% block content %}
+    <div class="container mt-5" id="ContainerGeneral">
+        <div id="card-principal">
+            <div class="card-header text-center">
+                <h2>Gestión de Planes</h2>
+            </div>
+            <div class="card-body">
+                <form method="POST" id="form-planes">
+                    {% csrf_token %}
+                    <div class="form-row">
+                        <div class="col">
+                            <label for="nombre_plan">Nombre del Plan:</label>
+                            <input type="text" id="nombre_plan" name="nombre" class="form-control" placeholder="Nombre del plan" value="{{ form.nombre.value|default:'' }}">
+                        </div>
+                    </div>
+                    <div class="form-row mt-3">
+                        <div class="col">
+                            <label for="precio_plan">Precio:</label>
+                            <input type="number" id="precio_plan" name="precio" class="form-control" placeholder="Precio" value="{{ form.precio.value|default:'' }}">
+                        </div>
+                        <div class="col">
+                            <label for="duracion_plan">Duración (días):</label>
+                            <input type="number" id="duracion_plan" name="duracion_dias" class="form-control" placeholder="Duración en días" value="{{ form.duracion_dias.value|default:'' }}">
+                        </div>
+                    </div>
+                    <div class="form-row mt-3">
+                        <button type="submit" class="btn btn-success m-2">Agregar</button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- tabla plane -->
+            <div class="card-body card mb-3">
+                <h5 class="card-title">Lista de Planes</h5>
+                <div class="form-row mb-3">
+                    <div class="col-4">
+                        <label for="buscar_plan" class="sr-only">Buscar</label>
+                        <input type="text" id="buscar_plan" class="form-control" placeholder="Buscar plan">
+                    </div>
+                    <div class="col">
+                        <button type="submit" class="btn btn-primary mb-2">Buscar</button>
+                    </div>
+                </div>
+                <table class="table table-bordered table-striped">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre del Plan</th>
+                            <th>Duración (días)</th>
+                            <th>Precio</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for plan in planes %}
+                        <tr>
+                            <td>{{ plan.id }}</td>
+                            <td>{{ plan.nombre }}</td>
+                            <td>{{ plan.duracion_dias }}</td>
+                            <td>{{ plan.precio }}</td>
+                            <td>
+                                <!-- editar btn -->
+                                <button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#editModal{{ plan.id }}">
+                                    Editar
+                                </button>
+
+                                <!-- eliminar btn -->
+                                <form method="post" action="{% url 'eliminar_plan' plan.id %}" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteModal{{ plan.id }}">Eliminar</button>
+                                </form>
+                            </td>
+                        </tr>
+
+                        <!-- Modalpa eliminar -->
+                        <div class="modal fade" id="editModal{{ plan.id }}" tabindex="-1" role="dialog" aria-labelledby="editModalLabel{{ plan.id }}" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="editModalLabel{{ plan.id }}">Editar Plan</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <!-- Formulario dentro del modal, precargado con los datos del plan -->
+                                        <form method="POST" action="{% url 'editar_plan' plan.id %}">
+                                            {% csrf_token %}
+                                            <div class="form-group">
+                                                <label for="nombre">Nombre del Plan</label>
+                                                <input type="text" class="form-control" id="nombre" name="nombre" value="{{ plan.nombre }}" required>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="precio">Precio</label>
+                                                <input type="number" class="form-control" id="precio" name="precio" value="{{ plan.precio }}" required>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="duracion_dias">Duración (días)</label>
+                                                <input type="number" class="form-control" id="duracion_dias" name="duracion_dias" value="{{ plan.duracion_dias }}" required>
+                                            </div>
+                                            <button type="submit" class="btn btn-warning m-2">Modificar</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Modal editarl-->
+                        <div class="modal fade" id="deleteModal{{ plan.id }}" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel{{ plan.id }}" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header bg-danger text-white">
+                                        <h5 class="modal-title" id="deleteModalLabel{{ plan.id }}">Confirmar Eliminación</h5>
+                                        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>¿Estás seguro de que deseas eliminar el plan <strong>{{ plan.nombre }}</strong>?</p>
+                                        <p>Esta acción no se puede deshacer.</p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                        <form method="post" action="{% url 'eliminar_plan' plan.id %}" style="display:inline;">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

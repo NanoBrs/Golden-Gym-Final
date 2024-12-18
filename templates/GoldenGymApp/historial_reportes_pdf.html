@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial de Reportes</title>
+    {% load static %}
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #ffffff;
+            min-height: 100vh;
+        }
+        
+        .container {
+            width: 95%;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #bbe1fa;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #1b262c;
+            border-radius: 8px;
+            color: white;
+            border: 2px solid #3282b8;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin: 0;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1b262c;
+            margin: 10px 0;
+            text-align: center;
+        }
+        
+        p {
+            color: #1b262c;
+            line-height: 1.4;
+            font-size: 1em;
+            margin: 10px 0;
+            text-align: center;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 15px 0;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border: none;
+            vertical-align: middle; 
+        }
+        
+        th {
+            background: #1b262c;
+            color: #bbe1fa;
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.85em;
+            letter-spacing: 1px;
+        }
+        
+        td {
+            background-color: #ffffff;
+            color: #1b262c;
+            font-weight: 500;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        tr:nth-child(even) td {
+            background-color: #f0f7fa;
+        }
+        
+        tr:hover td {
+            background-color: #e3f2fd;
+        }
+        
+        .empty-message {
+            text-align: center;
+            font-style: italic;
+            color: #1b262c;
+            padding: 20px;
+            font-size: 1em;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                width: 98%;
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+            
+            th, td {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <!-- Header con el logo y título -->
+        <div class="header">
+            <h1 class="mx-auto">GOLDEN GYM</h1>
+        </div>
+        
+        <div>
+            <h2 class="title">Reporte de Cliente: {{ cliente.nombre }} {{ cliente.apellido }}</h2>
+            <p>El siguiente documento presenta todos los reportes realizados por el cliente durante su estancia en el gimnasio</p>
+        </div>
+        
+        <!-- Tabla con los reportes -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Peso Actual [KG]</th>
+                    <th>Altura [M]</th>
+                    <th>IMC</th>
+                    <th>Press Banca [KG]</th>
+                    <th>Sentadilla [KG]</th>
+                    <th>Peso Muerto [KG]</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reporte in reportes %}
+                    <tr>
+                        <td>{{ reporte.fecha }}</td>
+                        <td>{{ reporte.peso_actual }}</td>
+                        <td>{{ reporte.altura }}</td>
+                        <td>{{ reporte.imc_actual }}</td>
+                        <td>{{ reporte.press_banca }}</td>
+                        <td>{{ reporte.sentadilla }}</td>
+                        <td>{{ reporte.peso_muerto }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="7" class="empty-message">No hay reportes para este cliente.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <!-- Mostrar el gráfico si está disponible -->
+        {% if grafico_base64 %}
+        <div class="grafico">
+            <h3>Progreso del Cliente</h3>
+            <img src="data:image/png;base64,{{ grafico_base64 }}" alt="Gráfico de Progreso" style="width: 100%; max-width: 800px; margin: 20px auto;">
+        </div>
+        {% endif %}
+
+    </div>
+
+</body>
+</html>

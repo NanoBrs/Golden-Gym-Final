@@ -1,0 +1,75 @@
+
+body {
+    background-image: url('../img/fondo.jpg');  /* Asegúrate de que la imagen esté en static/img */
+    background-size: cover;      /* Para que la imagen cubra toda la página */
+    background-position: center; /* Centra la imagen */
+    background-attachment: fixed; /* Fija la imagen mientras se desplaza el contenido */
+    color: white;                /* Establece el color de texto para que sea legible sobre el fondo */
+    margin: 0;                   /* Elimina márgenes por defecto del body */
+    height: 100vh;        
+    display: flex;        /* Usamos flexbox */
+    flex-direction: column;
+}
+/* Personalizar el botón de envío */
+.btn-primary {
+    background-color: #28a745; /* Cambia el color */
+    border-color: #28a745;
+}
+
+.btn-primary:hover {
+    background-color: #218838; /* Color al pasar el mouse */
+    border-color: #1e7e34;
+}
+
+/* Espaciado y estilo de etiquetas */
+label {
+    font-weight: bold;
+}
+
+ /* Cambiar el color y tamaño de los inputs */
+.form-control {
+    background-color: #eaeaea;
+    color: #333;
+    border: 1px solid #ddd;
+    width: 40px;
+}
+
+#InputUno{
+    width: 200px;
+
+}
+
+#ContainerGeneral{
+    background-color: rgba(255, 255, 255, 0.7); /* Gris con 50% de opacidad */
+    border-radius: 15px;
+    border:solid 1px rgba(41, 5, 5, 0.7);
+}
+
+#ContainerGeneral1{
+    background:none;
+    border: 0px;
+    padding-bottom: 15px;
+}
+
+#LogoIngreso{
+    max-width: 500px;
+    border-radius: 15px;
+    border: solid 1px rgba(0, 0, 0, 0.5);
+    
+}
+
+#ContainerNovedad{
+    background-color: rgba(255, 255, 255, 0.7); /* Gris con 50% de opacidad */
+    border-radius: 15px;
+    border:solid 1px rgba(41, 5, 5, 0.7);
+
+}
+
+.footer {
+    text-align: center;    /* Centra el texto dentro del footer */
+    padding: 20px;         /* Ajusta el padding a tu preferencia */
+    background-color: #343a40; /* El color de fondo de tu footer */
+    color: white;          /* Color del texto del footer */
+    width: 100%;           /* Asegura que el footer ocupe todo el ancho */
+}
+

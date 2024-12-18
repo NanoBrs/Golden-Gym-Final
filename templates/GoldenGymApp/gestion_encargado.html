@@ -1,0 +1,146 @@
+{% extends 'GoldenGymApp/base.html' %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Encargados</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+
+    {% block content %}
+    <div id="ContainerGeneral" class="container mt-5">
+
+        <!-- Formulario para agregar/modificar encargado -->
+        <div id="ContainerGeneral1" class="card mb-4">
+            
+            <div class="card-header">
+                <h2 class="text-center mb-4">Gestión de Encargado</h2>
+
+            </div>
+            <div id="Container" class="card-body">
+                <form method="POST">
+                    {% csrf_token %}
+
+                    <div class="form-row">
+                        <div class="col-8">
+                            <div class="form-row">
+                                <div class="col">
+                                    <label for="id_nombre">Nombre:</label>
+                                    <input type="text" name="nombre" id="id_nombre" class="form-control" placeholder="Ingrese su nombre" value="{{ form.nombre.value|default:'' }}">
+                                </div>
+                                
+
+                                <div class="col">
+                                    <label for="id_rut">RUT:</label>
+                                    <input type="text" name="rut" id="id_rut" class="form-control" placeholder="Ingrese su RUT" value="{{ form.rut.value|default:'' }}">
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="col">
+                                    <label for="id_apellido">Apellido:</label>
+                                    <input type="text" name="apellido" id="id_apellido" class="form-control"  placeholder="Ingrese su apellido" value="{{ form.apellido.value|default:'' }}">
+                                </div>
+                                
+
+                                <div class="col">
+                                    <label for="id_correo">Correo:</label>
+                                    <input type="email" name="correo" id="id_correo" class="form-control"  placeholder="Ingrese su correo" value="{{ form.correo.value|default:'' }}">
+                                </div>
+                            </div>
+
+                            <div class="form-row mt-3">
+                                <button type="submit" class="btn btn-danger m-2">Eliminar</button>
+                                <button type="submit" class="btn btn-primary m-2">Modificar</button>
+                                <button type="submit" class="btn btn-success m-2">Guardar</button>
+                            </div>
+
+                        </div>
+                        <div class="col-4">
+                            <div class="form-row ">
+                                <label for="id_correo">Usuario:</label>
+                                <input type="text" name="correo" id="id_correo" class="form-control"  placeholder="Ingrese su usuario" value="{{ form.correo.value|default:'' }}">
+
+                            </div>
+                            <div class="form-row ">
+                                <label for="id_correo">Contraseña:</label>
+                                <input type="password" name="pass" id="id_correo" class="form-control"  placeholder="Ingrese su contraseña" value="{{ form.correo.value|default:'' }}">
+
+                            </div>
+
+                        </div>
+                        
+                    </div>
+
+                </form>
+                
+            </div>
+        </div>
+
+        <!-- Tabla de encargados -->
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5>Lista de Encargados</h5>
+                <div class="form-row mt-3">
+                    <div class="col-4">
+                        <label for="searchInput" class="sr-only">Buscar</label>
+                        <input type="text" class="form-control" id="searchInput" placeholder="Escribe aquí..." required >
+                    </div>
+                    <div class="col">
+                        <button type="submit" class="btn btn-primary mb-2">Buscar</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered table-striped">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Apellido</th>
+                            <th>RUT</th>
+                            <th>Correo</th>
+                            <th>Contraseña</th>
+                            <th>Usuario</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for encargado in encargados %}
+                        <tr>
+                            <td>{{ encargado.id }}</td>
+                            <td>{{ encargado.nombre }}</td>
+                            <td>{{ encargado.apellido }}</td>
+                            <td>{{ encargado.rut }}</td>
+                            <td>{{ encargado.correo }}</td>
+                            <td>{{ encargado.contraseña }}</td>
+                            <td>{{ encargado.usuario }}</td>
+                            <td>
+                                <!-- Botón para editar encargado -->
+                                <form method="post" style="display:inline;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="encargado_id" value="{{ encargado.id }}">
+                                    <button type="submit" class="btn btn-warning btn-sm">Editar</button>
+                                </form>
+                                <!-- Botón para eliminar encargado -->
+                                <form method="post" action="{% url 'eliminar_encargado' encargado.id %}" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de eliminar este encargado?');">Eliminar</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    {% endblock %}
+</body>
+</html>

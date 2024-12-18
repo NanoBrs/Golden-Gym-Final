@@ -1,0 +1,58 @@
+{% extends 'GoldenGymApp/base.html' %}
+
+{% block content %}
+    <!-- Formulario de Registro -->
+    <div class="container mt-5" id="ContainerGeneral">
+        <div id="card-principal">
+            <div class="card-header text-center">
+                <h2>Registro</h2>
+            </div>
+            <div class="card-body">
+                <form method="POST" id="form-registro">
+                    {% csrf_token %}
+                    <div class="form-row">
+                        <!-- Parte izquierda con los campos de entrada -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="id_nombre">Nombre:</label>
+                                <input type="text" id="id_nombre" name="nombre" class="form-control" placeholder="Ingrese su nombre" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="id_rut">RUT:</label>
+                                <input type="text" id="id_rut" name="rut" class="form-control" placeholder="Ingrese su RUT" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="id_apellido">Apellido:</label>
+                                <input type="text" id="id_apellido" name="apellido" class="form-control" placeholder="Ingrese su apellido" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="id_correo">Correo:</label>
+                                <input type="email" id="id_correo" name="correo" class="form-control" placeholder="Ingrese su correo" required>
+                            </div>
+                            <div class="text-center mt-4">
+                                <button type="submit" class="btn btn-success btn-lg">Registrarse</button>
+                            </div>
+                        </div>
+
+                        <!-- Parte derecha -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>PLAN:</label><br>
+                                {% for choice in form.fields.membresia.choices %}
+                                    <div class="form-check">
+                                        <input type="checkbox" name="membresia" id="membresia_{{ forloop.counter }}" value="{{ choice.0 }}" class="form-check-input" 
+                                            {% if choice.0 == form.membresia.value %}checked{% endif %}>
+                                        <label class="form-check-label" for="membresia_{{ forloop.counter }}">{{ choice.1 }}</label>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            <p class="additional-info">
+                                <span class="red-text">$5.000</span> PESOS ADICIONALES POR MATRICULA
+                            </p>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
