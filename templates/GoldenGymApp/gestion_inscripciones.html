@@ -1,0 +1,175 @@
+{% extends 'GoldenGymApp/base.html' %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Inscripciones</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+{% block content %}
+<div id="ContainerGeneral" class="container mt-5">
+
+    <!-- Formulario para agregar/modificar inscripcion -->
+    <div id="ContainerGeneral1" class="card mb-4">
+        <div class="card-header">
+            <h2 class="text-center mb-4">Gestión de Inscripción</h2>
+        </div>
+        <div id="Container" class="card-body">
+            <form method="POST">
+                {% csrf_token %}
+                <div class="form-row">
+                    <div class="col">
+                        <label for="id_cliente">Cliente:</label>
+                        <select name="cliente" id="id_cliente" class="form-control">
+                            <option value="">Seleccione un cliente</option>
+                            {% for cliente in clientes %}
+                            <option value="{{ cliente.id }}" {% if form.cliente.value == cliente.id %}selected{% endif %}>{{ cliente.nombre }} {{ cliente.apellido }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col">
+                        <label for="id_plan">Plan:</label>
+                        <select name="plan" id="id_plan" class="form-control">
+                            <option value="">Seleccione un plan</option>
+                            {% for plan in planes %}
+                            <option value="{{ plan.id }}" {% if form.plan.value == plan.id %}selected{% endif %}>{{ plan.nombre }} - Precio:${{plan.precio}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row mt-3">
+                    <div class="col">
+                        <label for="id_monto_pagado">Monto Pagado:</label>
+                        <input type="number" name="monto_pagado" id="id_monto_pagado" class="form-control" value="{{ form.monto_pagado.value|default:'' }}">
+                    </div>
+                    <div class="col">
+                        <label for="id_metodo_pago">Método de Pago:</label>
+                        <select name="metodo_pago" id="id_metodo_pago" class="form-control">
+                            <option value="EFECTIVO" {% if form.metodo_pago.value == 'EFECTIVO' %}selected{% endif %}>Efectivo</option>
+                            <option value="TRANSFERENCIA" {% if form.metodo_pago.value == 'TRANSFERENCIA' %}selected{% endif %}>Transferencia</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row mt-3">
+                    <button type="submit" class="btn btn-success">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tabla de inscripciones -->
+    <div class="card mb-3">
+        <div class="card-header">
+            <h5>Lista de Inscripciones</h5>
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered table-striped">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Cliente</th>
+                        <th>Plan</th>
+                        <th>Encargado</th>
+                        <th>Monto Pagado</th>
+                        <th>Método de Pago</th>
+                        <th>Fecha Transacción</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for inscripcion in inscripciones %}
+                    <tr>
+                        <td>{{ inscripcion.id }}</td>
+                        <td>{{ inscripcion.cliente.nombre }} {{ inscripcion.cliente.apellido }}</td>
+                        <td>{{ inscripcion.plan.nombre }}</td>
+                        <td>{{ inscripcion.encargado.username }}</td>
+                        <td>{{ inscripcion.monto_pagado }}</td>
+                        <td>{{ inscripcion.metodo_pago }}</td>
+                        <td>{{ inscripcion.fecha_transaccion }}</td>
+                        <td>
+                            <!-- Botón para editar inscripcion -->
+                            <button class="btn btn-warning btn-sm" data-toggle="modal" data-target="#editarModal{{ inscripcion.id }}">Editar</button>
+                            <!-- Modal de edición -->
+                            <div class="modal fade" id="editarModal{{ inscripcion.id }}" tabindex="-1" aria-labelledby="editarModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="editarModalLabel">Editar Inscripción</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <form method="POST" action="{% url 'editar_inscripcion' inscripcion.id %}">
+                                            {% csrf_token %}
+                                            <div class="modal-body">
+                                                <div class="form-row">
+                                                    <div class="col">
+                                                        <label for="id_cliente">Cliente:</label>
+                                                        <select name="cliente" id="id_cliente" class="form-control">
+                                                            <option value="{{ inscripcion.cliente.id }}" selected>{{ inscripcion.cliente.nombre }} {{ inscripcion.cliente.apellido }}</option>
+                                                            {% for cliente in clientes %}
+                                                            <option value="{{ cliente.id }}">{{ cliente.nombre }} {{ cliente.apellido }}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                    <div class="col">
+                                                        <label for="id_plan">Plan:</label>
+                                                        <select name="plan" id="id_plan" class="form-control">
+                                                            <option value="{{ inscripcion.plan.id }}" selected>{{ inscripcion.plan.nombre }}</option>
+                                                            {% for plan in planes %}
+                                                            <option value="{{ plan.id }}">{{ plan.nombre }}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="form-row mt-3">
+                                                    <div class="col">
+                                                        <label for="id_monto_pagado">Monto Pagado:</label>
+                                                        <input type="number" name="monto_pagado" id="id_monto_pagado" class="form-control" value="{{ inscripcion.monto_pagado }}">
+                                                    </div>
+                                                </div>
+                                                <div class="form-row mt-3">
+                                                    <div class="col">
+                                                        <label for="id_metodo_pago">Método de Pago:</label>
+                                                        <select name="metodo_pago" id="id_metodo_pago" class="form-control">
+                                                            <option value="EFECTIVO" {% if inscripcion.metodo_pago == 'EFECTIVO' %}selected{% endif %}>Efectivo</option>
+                                                            <option value="TRANSFERENCIA" {% if inscripcion.metodo_pago == 'TRANSFERENCIA' %}selected{% endif %}>Transferencia</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                                                <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Botón para eliminar inscripcion -->
+                            <form method="post" action="{% url 'eliminar_inscripcion' inscripcion.id %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de eliminar esta inscripción?');">Eliminar</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+</body>
+</html>

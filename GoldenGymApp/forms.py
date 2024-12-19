@@ -1,22 +1,20 @@
 from django import forms
-from .models import Cliente,Encargado,Novedad,Reporte,Plan
+from .models import Cliente,Encargado,Novedad,Reporte,Plan,Inscripcion
 
 class ClienteForm(forms.ModelForm):
-    membresia = forms.ChoiceField(
-        choices=Cliente.PLANES_MEMBRESIA,
-        widget=forms.RadioSelect,  # Opción para seleccionar un solo plan
-        label="PLAN"
-    )
-
     class Meta:
         model = Cliente
-        fields = ['nombre', 'apellido', 'rut', 'correo', 'membresia']
-        widgets = {
-            'nombre': forms.TextInput(attrs={'class': 'form-control', 'style': 'background-color: #666; color: white;'}),
-            'apellido': forms.TextInput(attrs={'class': 'form-control', 'style': 'background-color: #666; color: white;'}),
-            'rut': forms.TextInput(attrs={'class': 'form-control', 'style': 'background-color: #666; color: white;'}),
-            'correo': forms.EmailInput(attrs={'class': 'form-control', 'style': 'background-color: #666; color: white;'}),
-        }
+        fields = ['nombre', 'apellido', 'rut', 'correo', 'suscripcion_activa']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Deshabilitar el campo encargado si es necesario, pero no lo incluyas en 'fields'
+        if self.instance.pk:  # Si estamos editando un cliente existente
+            # No deberías estar accediendo al campo 'encargado' aquí, ya que no está en 'fields'
+            # Si lo quieres deshabilitar en el formulario, puedes hacerlo manualmente si fuera necesario
+            pass
+
+
 class EncargadoForm(forms.ModelForm):
     class Meta:
         model = Encargado
@@ -50,3 +48,15 @@ class PlanForm(forms.ModelForm):
     class Meta:
         model = Plan
         fields = ['nombre', 'precio', 'duracion_dias']
+
+
+class InscripcionForm(forms.ModelForm):
+    class Meta:
+        model = Inscripcion
+        fields = ['cliente', 'plan', 'monto_pagado', 'metodo_pago']  # Sin 'encargado' porque lo asignamos automáticamente
+        widgets = {
+            'cliente': forms.Select(attrs={'class': 'form-control'}),
+            'plan': forms.Select(attrs={'class': 'form-control'}),
+            'monto_pagado': forms.NumberInput(attrs={'class': 'form-control'}),
+            'metodo_pago': forms.Select(choices=Inscripcion.METODOS_PAGO, attrs={'class': 'form-control'}),
+        }

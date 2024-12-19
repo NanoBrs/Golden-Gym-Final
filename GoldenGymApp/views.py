@@ -3,9 +3,20 @@ from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.urls import reverse
 from django.template.loader import render_to_string
 from weasyprint import HTML
-from GoldenGymApp.models import Cliente, Encargado, Novedad, Reporte, Plan
-from GoldenGymApp.forms import ClienteForm,EncargadoForm,NovedadForm,ReporteForm,PlanForm
+from GoldenGymApp.models import Cliente, Encargado, Novedad, Reporte, Plan, Inscripcion
+from GoldenGymApp.forms import ClienteForm,EncargadoForm,NovedadForm,ReporteForm,PlanForm,InscripcionForm
+import matplotlib.pyplot as plt
+from weasyprint import HTML
+from django.shortcuts import render, get_object_or_404
+from django.template.loader import render_to_string
+from django.http import HttpResponse
+from io import BytesIO
+import base64
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
+from .models import Cliente, Reporte
 
+@login_required
 def gestion_clientes(request):
     if request.method == 'POST':
         if 'cliente_id' in request.POST:
@@ -14,31 +25,55 @@ def gestion_clientes(request):
         else:
             form = ClienteForm(request.POST)
 
-        # Verifica si el formulario es válido
         if form.is_valid():
-            form.save()
-            return redirect('gestion_clientes')  # Redirige después de guardar
-        else:
-            print(form.errors)  # Imprime los errores del formulario para depuración
+            cliente = form.save(commit=False)
+            cliente.encargado = request.user  # Guardar el encargado (usuario que está haciendo la acción)
+            if not cliente.suscripcion_activa:  # Permitir que la suscripción activa sea False
+                cliente.suscripcion_activa = False
+            cliente.save()
+            return redirect('gestion_clientes')
     else:
         form = ClienteForm()
 
+    # Obtener todos los clientes para mostrarlos en la tabla
     clientes = Cliente.objects.all()
-    return render(request, 'GoldenGymApp/gestion_cliente.html', {'form': form, 'clientes': clientes})
 
-def editar_cliente(request, cliente_id):
-    cliente = get_object_or_404(Cliente, id=cliente_id)
-    
+    return render(
+        request,
+        'GoldenGymApp/gestion_cliente.html',  # Asegúrate de que el nombre de tu template es correcto
+        {'form': form, 'clientes': clientes}
+    )
+
+def registrar_cliente(request):
+    if request.method == 'POST':
+        form = ClienteForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('clientes')  # Redirigir a la lista de clientes
+    else:
+        form = ClienteForm()
+
+    return render(request, 'GoldenGymApp/agregar_cliente.html', {'form': form})
+
+@login_required
+def editar_cliente(request, pk):
+    cliente = get_object_or_404(Cliente, pk=pk)
     if request.method == 'POST':
         form = ClienteForm(request.POST, instance=cliente)
         if form.is_valid():
-            form.save()
-            return redirect('gestion_clientes')  # Redirige a la lista de clientes después de guardar
+            cliente = form.save(commit=False)
+            cliente.encargado = request.user  # Asignar el usuario actual como encargado
+            cliente.save()
+            return redirect('gestion_clientes')  # Redirigir a la lista de clientes
     else:
         form = ClienteForm(instance=cliente)
 
-    return render(request, 'GoldenGymApp/gestion_cliente.html', {'form': form, 'cliente': cliente})
+    return render(request, 'GoldenGymApp/editar_cliente.html', {'form': form, 'cliente': cliente})
 
+
+
+
+# Vista para eliminar un cliente@login_required
 def eliminar_cliente(request, cliente_id):
     cliente = get_object_or_404(Cliente, id=cliente_id)
     cliente.delete()
@@ -73,7 +108,7 @@ def novedades(request):
         novedad.contenido_formateado = novedad.contenido.replace('\n', '<br>')
 
     return render(request, 'GoldenGymApp/novedades.html', {'novedades': novedades})
-
+@login_required
 # Vista para mostrar los reportes de un cliente
 def reportes_cliente(request, cliente_id):
     cliente = get_object_or_404(Cliente, id=cliente_id)
@@ -85,7 +120,7 @@ def reportes_cliente(request, cliente_id):
     })
 
 # Vista para crear un nuevo reporte para un cliente
-
+@login_required
 def crear_reporte(request, cliente_id):
     cliente = get_object_or_404(Cliente, id=cliente_id)
     
@@ -96,13 +131,13 @@ def crear_reporte(request, cliente_id):
             reporte.cliente = cliente  # Asociamos el reporte al cliente
             reporte.save()
             # Si la solicitud es AJAX, devolver una respuesta JSON
-            if request.is_ajax():
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return JsonResponse({'success': True})
             # Si no es AJAX, redirigir como de costumbre
             return redirect('reportes_cliente', cliente_id=cliente.id)
         else:
             # Si el formulario no es válido, devolver error
-            if request.is_ajax():
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return JsonResponse({'success': False})
     
     else:
@@ -112,7 +147,7 @@ def crear_reporte(request, cliente_id):
         'form': form,
         'cliente': cliente
     })
-
+@login_required
 def editar_reporte(request, reporte_id):
     reporte = get_object_or_404(Reporte, id=reporte_id)
     if request.method == 'POST':
@@ -124,7 +159,7 @@ def editar_reporte(request, reporte_id):
         form = ReporteForm(instance=reporte)
 
     return render(request, 'GoldenGymApp/editar_reporte.html', {'form': form, 'reporte': reporte})
-
+@login_required
 def eliminar_reporte(request, reporte_id):
     reporte = get_object_or_404(Reporte, id=reporte_id)
     cliente_id = reporte.cliente.id  # Guardar el ID del cliente para redirigir después
@@ -132,16 +167,7 @@ def eliminar_reporte(request, reporte_id):
     reporte.delete()
     return redirect('reportes_cliente', cliente_id=cliente_id)
 
-import matplotlib.pyplot as plt
-from weasyprint import HTML
-from django.shortcuts import render, get_object_or_404
-from django.template.loader import render_to_string
-from django.http import HttpResponse
-from io import BytesIO
-import base64
-from django.contrib.auth import authenticate, login
-from django.contrib.auth.decorators import login_required
-from .models import Cliente, Reporte
+
 
 
 def generar_pdf_historial_reportes(request, cliente_id):
@@ -241,16 +267,6 @@ def editar_plan(request, plan_id):
 
     # Pasamos el formulario a la plantilla
     return render(request, 'GoldenGymApp/gestion_planes.html', {'form': form, 'plan': plan})
-@login_required
-def registro_usuario(request):
-    
-    form = ClienteForm()
-    if request.method == 'POST':
-        form = ClienteForm(request.POST)
-        if form.is_valid():
-            form.save()
-            # Redirigir o hacer algo después de guardar
-    return render(request, 'GoldenGymApp/registro.html', {'form': form})
 
 
 @login_required
@@ -300,6 +316,66 @@ def login_view(request):
             
     # Si el método es GET, no se muestra ningún error o mensaje
     return render(request, 'GoldenGymApp/login.html')
+
+
+@login_required
+def gestion_inscripciones(request):
+    clientes = Cliente.objects.all()
+    planes = Plan.objects.all()
+
+    if request.method == 'POST':
+        form = InscripcionForm(request.POST)
+        if form.is_valid():
+            # Asignar el encargado como el usuario que ha iniciado sesión
+            inscripcion = form.save(commit=False)
+            inscripcion.encargado = request.user  # El encargado es el usuario logueado
+            inscripcion.save()
+            return redirect('gestion_inscripciones')  # Redirigir después de guardar
+    else:
+        form = InscripcionForm()
+
+    # Listar las inscripciones para mostrarlas en la tabla
+    inscripciones = Inscripcion.objects.all()
+
+    return render(request, 'GoldenGymApp/gestion_inscripciones.html', {
+        'form': form,
+        'inscripciones': inscripciones,
+        'clientes': clientes,
+        'planes': planes,
+    })
+@login_required
+def eliminar_inscripcion(request, inscripcion_id):
+    inscripcion = get_object_or_404(Inscripcion, id=inscripcion_id)
+    inscripcion.delete()  # Eliminar la inscripción
+    return redirect('gestion_inscripciones')  # Redirigir de nuevo a la vista de gestión
+
+
+@login_required
+def editar_inscripcion(request, id):
+    inscripcion = get_object_or_404(Inscripcion, id=id)
+    
+    if request.method == 'POST':
+        form = InscripcionForm(request.POST, instance=inscripcion)
+        if form.is_valid():
+            form.save()
+            return redirect('gestion_inscripciones')  # Redirigir después de guardar
+    else:
+        form = InscripcionForm(instance=inscripcion)
+    
+    return render(request, 'GoldenGymApp/gestion_inscripciones.html', {'form': form, 'inscripcion': inscripcion})
+def eliminar_inscripcion(request, id):
+    # Obtén la inscripción utilizando el id
+    inscripcion = get_object_or_404(Inscripcion, id=id)
+    
+    # Eliminar la inscripción
+    inscripcion.delete()
+    
+    # Redirigir a la página de gestión de inscripciones
+    return redirect('gestion_inscripciones')
+
+
+
+
 
 #--------------------------- Encargado función antigua -------------------------------------
 '''
