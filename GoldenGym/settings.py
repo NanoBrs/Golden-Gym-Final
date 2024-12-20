@@ -129,7 +129,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Carpeta de recopilación 
 # Configuración de autenticación y permisos
 AUTH_USER_MODEL = 'GoldenGymApp.Encargado'
 LOGIN_URL = '/login/'
-LOGIN_REDIRECT_URL = '/gestion_encargado/'
+LOGIN_REDIRECT_URL = '/gestion_encargados/'
 LOGOUT_REDIRECT_URL = 'login'
 # Archivos de medios (imágenes y otros archivos subidos por usuarios)
 MEDIA_URL = '/media/'  # URL pública para acceder a los medios

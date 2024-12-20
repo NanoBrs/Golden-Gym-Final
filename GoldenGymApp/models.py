@@ -93,7 +93,8 @@ class Reporte(models.Model):
 
     def calcular_imc(self):
         if self.altura > 0:
-            return round(self.peso_actual / (self.altura ** 2), 2)
+            altura_metros = self.altura / 100  # Convertir de cm a m
+            return round(self.peso_actual / (altura_metros ** 2), 2)
         return None
 
     def save(self, *args, **kwargs):
