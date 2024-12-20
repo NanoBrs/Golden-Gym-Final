@@ -14,55 +14,67 @@
 
     {% block content %}
     <div id="ContainerGeneral" class="container mt-5">
-
         <!-- Formulario para agregar/modificar encargado -->
         <div id="ContainerGeneral1" class="card mb-4">
-            
             <div class="card-header">
-                <h2 class="text-center mb-4">Gestión de Encargado</h2>
+                <h2 class="text-center mb-4">Gestión de Encargados</h2>
             </div>
             <div id="Container" class="card-body">
                 <form method="POST">
                     {% csrf_token %}
                     <div class="form-row">
-                        <div class="col">
-                            <label for="id_username">Usuario:</label>
-                            <input type="text" name="username" id="id_username" class="form-control" placeholder="Ingrese un usuario" value="{{ form.username.value|default:'' }}">
-                        </div>
-                        <div class="col">
-                            <label for="id_password">Contraseña:</label>
-                            <input type="password" name="password" id="id_password" class="form-control" placeholder="Ingrese una contraseña">
+                        <!-- Datos para agregar al encargado -->
+                        <div class="col-md-12">
+                            <div class="form-row">
+                                <div class="col">
+                                    <label for="id_username">Usuario:</label>
+                                    <input type="text" name="username" id="id_username" class="form-control" placeholder="Ingrese el usuario" value="{{ form.username.value|default:'' }}">
+                                </div>
+                                <div class="col">
+                                    <label for="id_rut">RUT:</label>
+                                    <input type="text" name="rut" id="id_rut" class="form-control" placeholder="Ingrese el RUT" value="{{ form.rut.value|default:'' }}">
+                                </div>
+                            </div>
+
+                            <div class="form-row mt-3">
+                                <div class="col">
+                                    <label for="id_first_name">Nombre:</label>
+                                    <input type="text" name="first_name" id="id_first_name" class="form-control" placeholder="Ingrese el nombre" value="{{ form.first_name.value|default:'' }}">
+                                </div>
+                                <div class="col">
+                                    <label for="id_last_name">Apellido:</label>
+                                    <input type="text" name="last_name" id="id_last_name" class="form-control" placeholder="Ingrese el apellido" value="{{ form.last_name.value|default:'' }}">
+                                </div>
+                            </div>
+
+                            <div class="form-row mt-3">
+                                <div class="col">
+                                    <label for="id_email">Correo:</label>
+                                    <input type="email" name="email" id="id_email" class="form-control" placeholder="Ingrese el correo" value="{{ form.email.value|default:'' }}">
+                                </div>
+                                <div class="col">
+                                    <label for="id_password">Contraseña:</label>
+                                    <input type="password" name="password" id="id_password" class="form-control" placeholder="Ingrese la contraseña" value="">
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="form-row mt-3">
-                        <div class="col">
-                            <label for="id_first_name">Nombre:</label>
-                            <input type="text" name="first_name" id="id_first_name" class="form-control" placeholder="Ingrese su nombre" value="{{ form.first_name.value|default:'' }}">
+
+                    <!-- Botones de Acción -->
+                    <div class="form-row mt-4">
+                        <div class="col text-center">
+                            {% if form.instance.pk %}
+                            {% else %}
+                                <button type="submit" class="btn btn-success m-2">Guardar</button>
+                            {% endif %}
                         </div>
-                        <div class="col">
-                            <label for="id_last_name">Apellido:</label>
-                            <input type="text" name="last_name" id="id_last_name" class="form-control" placeholder="Ingrese su apellido" value="{{ form.last_name.value|default:'' }}">
-                        </div>
-                    </div>
-                    <div class="form-row mt-3">
-                        <div class="col">
-                            <label for="id_rut">RUT:</label>
-                            <input type="text" name="rut" id="id_rut" class="form-control" placeholder="Ingrese su RUT" value="{{ form.rut.value|default:'' }}">
-                        </div>
-                        <div class="col">
-                            <label for="id_email">Correo:</label>
-                            <input type="email" name="email" id="id_email" class="form-control" placeholder="Ingrese su correo" value="{{ form.email.value|default:'' }}">
-                        </div>
-                    </div>
-                    <div class="form-row mt-3">
-                        <button type="submit" class="btn btn-success">Guardar</button>
                     </div>
                 </form>
             </div>
         </div>
 
         <!-- Tabla de encargados -->
-        <div class="card mb-3">
+        <div class="card">
             <div class="card-header">
                 <h5>Lista de Encargados</h5>
                 <div class="form-row mt-3">
@@ -80,11 +92,11 @@
                     <thead class="thead-dark">
                         <tr>
                             <th>ID</th>
+                            <th>Usuario</th>
                             <th>Nombre</th>
                             <th>Apellido</th>
                             <th>RUT</th>
                             <th>Correo</th>
-                            <th>Usuario</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -92,22 +104,16 @@
                         {% for encargado in encargados %}
                         <tr>
                             <td>{{ encargado.id }}</td>
+                            <td>{{ encargado.username }}</td>
                             <td>{{ encargado.first_name }}</td>
                             <td>{{ encargado.last_name }}</td>
                             <td>{{ encargado.rut }}</td>
                             <td>{{ encargado.email }}</td>
-                            <td>{{ encargado.username }}</td>
                             <td>
-                                <!-- Botón para editar encargado -->
-                                <form method="post" style="display:inline;">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="encargado_id" value="{{ encargado.id }}">
-                                    <button type="submit" class="btn btn-warning btn-sm">Editar</button>
-                                </form>
-                                <!-- Botón para eliminar encargado -->
+                                <a href="{% url 'editar_encargado' encargado.id %}" class="btn btn-warning btn-sm">Editar</a>
                                 <form method="post" action="{% url 'eliminar_encargado' encargado.id %}" style="display:inline;">
                                     {% csrf_token %}
-                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de eliminar este encargado?');">Eliminar</button>
+                                    <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
                                 </form>
                             </td>
                         </tr>
@@ -117,7 +123,10 @@
             </div>
         </div>
     </div>
-
     {% endblock %}
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

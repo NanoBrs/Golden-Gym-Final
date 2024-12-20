@@ -15,9 +15,10 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(next_page='login'), name='logout'),
 
     #----------------   VIEWS ENCARGADO --------------------------------------------------------------------------------------------------------
-    path('gestion_encargado/',views.gestion_encargados,name='gestion_encargado'),
-    path('eliminar_encargado/<int:id>/', views.eliminar_encargado, name='eliminar_encargado'),
-
+    path('gestion_encargados/', views.gestion_encargados, name='gestion_encargados'),
+    path('eliminar_encargado/<int:encargado_id>/', views.eliminar_encargado, name='eliminar_encargado'),
+    path('editar_encargado/<int:pk>/', views.editar_encargado, name='editar_encargado'),
+    path('registro_encargado/', views.registrar_encargado, name='registro_encargado'),
     #----------------   VIEWS CLIENTE --------------------------------------------------------------------------------------------------------
     
     path('gestion_clientes/',views.gestion_clientes,name='gestion_clientes'),

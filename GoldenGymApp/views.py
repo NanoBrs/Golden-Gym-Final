@@ -15,7 +15,7 @@ import base64
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from .models import Cliente, Reporte
-
+from django.contrib import messages
 @login_required
 def gestion_clientes(request):
     if request.method == 'POST':
@@ -43,7 +43,7 @@ def gestion_clientes(request):
         'GoldenGymApp/gestion_cliente.html',  # Asegúrate de que el nombre de tu template es correcto
         {'form': form, 'clientes': clientes}
     )
-
+@login_required
 def registrar_cliente(request):
     if request.method == 'POST':
         form = ClienteForm(request.POST)
@@ -69,8 +69,6 @@ def editar_cliente(request, pk):
         form = ClienteForm(instance=cliente)
 
     return render(request, 'GoldenGymApp/editar_cliente.html', {'form': form, 'cliente': cliente})
-
-
 
 
 # Vista para eliminar un cliente@login_required
@@ -267,36 +265,74 @@ def editar_plan(request, plan_id):
 
     # Pasamos el formulario a la plantilla
     return render(request, 'GoldenGymApp/gestion_planes.html', {'form': form, 'plan': plan})
+from django.shortcuts import render, get_object_or_404, redirect
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+from django.contrib.auth.decorators import login_required
+from .models import Encargado  # Asegúrate de tener el modelo Encargado en tu aplicación
+from .forms import EncargadoForm  # Define un formulario para gestionar los encargados
 
-
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from .models import Encargado
+from .forms import EncargadoForm
 @login_required
 def gestion_encargados(request):
-    if request.method == "POST":
-        encargado_id = request.POST.get('encargado_id')
-        if encargado_id:  # Editar encargado
-            encargado = get_object_or_404(Encargado, id=encargado_id)
+    if request.method == 'POST':
+        if 'encargado_id' in request.POST:
+            encargado = get_object_or_404(Encargado, id=request.POST['encargado_id'])
             form = EncargadoForm(request.POST, instance=encargado)
-        else:  # Crear nuevo encargado
+        else:
             form = EncargadoForm(request.POST)
 
         if form.is_valid():
-            form.save()
-            return redirect('gestion_encargado')
-
+            encargado = form.save(commit=False)
+            encargado.save()
+            return redirect('gestion_encargados')
     else:
         form = EncargadoForm()
 
+    # Obtener todos los encargados para mostrarlos en la tabla
     encargados = Encargado.objects.all()
-    return render(request, 'GoldenGymApp/gestion_encargado.html', {
-        'form': form,
-        'encargados': encargados
-    })
+
+    return render(
+        request,
+        'GoldenGymApp/gestion_encargado.html',
+        {'form': form, 'encargados': encargados}
+    )
 
 @login_required
-def eliminar_encargado(request, id):
-    encargado = get_object_or_404(Encargado, id=id)
+def registrar_encargado(request):
+    if request.method == 'POST':
+        form = EncargadoForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('gestion_encargados')
+    else:
+        form = EncargadoForm()
+
+    return render(request, 'GoldenGymApp/agregar_encargado.html', {'form': form})
+
+@login_required
+def editar_encargado(request, pk):
+    encargado = get_object_or_404(Encargado, pk=pk)
+    if request.method == 'POST':
+        form = EncargadoForm(request.POST, instance=encargado)
+        if form.is_valid():
+            encargado = form.save(commit=False)
+            encargado.save()
+            return redirect('gestion_encargados')
+    else:
+        form = EncargadoForm(instance=encargado)
+
+    return render(request, 'GoldenGymApp/editar_encargado.html', {'form': form, 'encargado': encargado})
+
+@login_required
+def eliminar_encargado(request, encargado_id):
+    encargado = get_object_or_404(Encargado, id=encargado_id)
     encargado.delete()
-    return redirect('gestion_encargado')
+    return HttpResponseRedirect(reverse('gestion_encargados'))
+
 
 def login_view(request):
     if request.method == 'POST':

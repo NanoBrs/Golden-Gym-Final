@@ -11,7 +11,7 @@
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light pl-5 pr-5">
-        <a class="navbar-brand" href="validar_ingreso">
+        <a class="navbar-brand" href="{% url 'novedades' %}">
             <img src="{% static 'img/Logo.png' %}" alt="Golden Gym Logo" width="50" height="50" class="d-inline-block align-text-top">
         </a>
         Golden Gym
@@ -28,7 +28,7 @@
                         <a class="nav-link" href="{% url 'validar_ingreso' %}">Ingreso</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'gestion_encargado' %}">Registro</a>
+                        <a class="nav-link" href="{% url 'gestion_encargados' %}">Encargados</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'gestion_clientes' %}">Clientes</a>
